@@ -1,71 +1,74 @@
-/* Modern Dark Theme Design System for Library Master-Detail Application */
+/* Modern Ultra-Clean Dark CSS Design System for Library Master-Detail Application */
 
 .root {
-    -fx-font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+    -fx-font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
     -fx-font-size: 13px;
-    -fx-base: #0F172A;
-    -fx-background: #0F172A;
-    -fx-control-inner-background: #1E293B;
-    -fx-text-fill: #F8FAFC;
+    -fx-base: #0B0F19;
+    -fx-background: #0B0F19;
+    -fx-control-inner-background: #111827;
+    -fx-text-fill: #F9FAFB;
 }
 
 .root-layout {
-    -fx-background-color: #0F172A;
+    -fx-background-color: #0B0F19;
 }
 
 /* Header */
 .app-header {
-    -fx-background-color: #1E293B;
-    -fx-border-color: #334155;
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
     -fx-border-width: 0 0 1 0;
 }
 
 .header-title {
-    -fx-font-size: 17px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F8FAFC;
+    -fx-text-fill: #F9FAFB;
 }
 
 .header-subtitle {
     -fx-font-size: 11px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: #9CA3AF;
 }
 
 .header-badge {
-    -fx-background-color: #334155;
+    -fx-background-color: #1F2937;
     -fx-text-fill: #38BDF8;
-    -fx-padding: 4px 10px;
-    -fx-background-radius: 12px;
+    -fx-padding: 5px 12px;
+    -fx-background-radius: 20px;
     -fx-font-weight: bold;
     -fx-font-size: 11px;
+    -fx-border-color: #374151;
+    -fx-border-radius: 20px;
 }
 
 /* Sidebar Navigation */
 .app-sidebar {
-    -fx-background-color: #1E293B;
-    -fx-border-color: #334155;
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
     -fx-border-width: 0 1 0 0;
 }
 
 .nav-section-label {
     -fx-font-size: 10px;
     -fx-font-weight: bold;
-    -fx-text-fill: #64748B;
-    -fx-padding: 0 0 6px 8px;
+    -fx-text-fill: #6B7280;
+    -fx-padding: 4px 0 8px 8px;
+    -fx-letter-spacing: 1px;
 }
 
 .nav-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: #9CA3AF;
     -fx-font-size: 13px;
-    -fx-padding: 10px 14px;
-    -fx-background-radius: 6px;
+    -fx-padding: 11px 16px;
+    -fx-background-radius: 8px;
     -fx-cursor: hand;
 }
 
 .nav-button:hover {
-    -fx-background-color: #334155;
-    -fx-text-fill: #F8FAFC;
+    -fx-background-color: #1F2937;
+    -fx-text-fill: #F9FAFB;
 }
 
 .nav-button-active {
@@ -80,18 +83,18 @@
 
 /* Master Detail Container */
 .master-detail-container {
-    -fx-background-color: #0F172A;
+    -fx-background-color: #0B0F19;
 }
 
 /* Inputs & Form Controls */
 .search-input {
-    -fx-background-color: #1E293B;
-    -fx-text-fill: #F8FAFC;
-    -fx-prompt-text-fill: #64748B;
-    -fx-border-color: #334155;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 6px 12px;
+    -fx-background-color: #111827;
+    -fx-text-fill: #F9FAFB;
+    -fx-prompt-text-fill: #6B7280;
+    -fx-border-color: #374151;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 14px;
 }
 
 .search-input:focused {
@@ -99,11 +102,12 @@
 }
 
 .combo-box, .text-field, .spinner, .text-area, .date-picker {
-    -fx-background-color: #1E293B;
-    -fx-text-fill: #F8FAFC;
-    -fx-border-color: #334155;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+    -fx-background-color: #111827;
+    -fx-text-fill: #F9FAFB;
+    -fx-border-color: #374151;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
 }
 
 .combo-box:focused, .text-field:focused, .spinner:focused, .text-area:focused {
@@ -115,8 +119,8 @@
     -fx-background-color: #0284C7;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 18px;
     -fx-cursor: hand;
 }
 
@@ -125,23 +129,25 @@
 }
 
 .button-secondary {
-    -fx-background-color: #334155;
-    -fx-text-fill: #F8FAFC;
-    -fx-background-radius: 6px;
+    -fx-background-color: #1F2937;
+    -fx-text-fill: #F9FAFB;
+    -fx-border-color: #374151;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
     -fx-padding: 8px 16px;
     -fx-cursor: hand;
 }
 
 .button-secondary:hover {
-    -fx-background-color: #475569;
+    -fx-background-color: #374151;
 }
 
 .button-success {
     -fx-background-color: #10B981;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 18px;
     -fx-cursor: hand;
 }
 
@@ -153,8 +159,8 @@
     -fx-background-color: #EF4444;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 18px;
     -fx-cursor: hand;
 }
 
@@ -164,42 +170,43 @@
 
 /* TableView */
 .table-view {
-    -fx-background-color: #1E293B;
-    -fx-border-color: #334155;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #0F172A;
+    -fx-background-color: #0B0F19;
 }
 
 .table-view .column-header {
-    -fx-background-color: #0F172A;
-    -fx-border-color: #334155;
+    -fx-background-color: #0B0F19;
+    -fx-border-color: #1F2937;
     -fx-border-width: 0 0 1 0;
-    -fx-padding: 8px 4px;
+    -fx-padding: 10px 6px;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: #9CA3AF;
     -fx-font-weight: bold;
     -fx-font-size: 11px;
 }
 
 .table-row-cell {
-    -fx-background-color: #1E293B;
-    -fx-text-fill: #F8FAFC;
-    -fx-border-color: #334155;
+    -fx-background-color: #111827;
+    -fx-text-fill: #F9FAFB;
+    -fx-border-color: #1F2937;
     -fx-border-width: 0 0 1 0;
+    -fx-padding: 4px;
 }
 
 .table-row-cell:odd {
-    -fx-background-color: #182234;
+    -fx-background-color: #0F172A;
 }
 
 .table-row-cell:hover {
-    -fx-background-color: #334155;
+    -fx-background-color: #1F2937;
 }
 
 .table-row-cell:selected {
@@ -209,78 +216,78 @@
 
 /* Status Badges */
 .badge {
-    -fx-padding: 3px 8px;
-    -fx-background-radius: 10px;
-    -fx-font-size: 10px;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 12px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
 .badge-success {
-    -fx-background-color: rgba(16, 185, 129, 0.2);
+    -fx-background-color: rgba(16, 185, 129, 0.18);
     -fx-text-fill: #34D399;
 }
 
 .badge-danger {
-    -fx-background-color: rgba(239, 68, 68, 0.2);
+    -fx-background-color: rgba(239, 68, 68, 0.18);
     -fx-text-fill: #FCA5A5;
 }
 
 .badge-info {
-    -fx-background-color: rgba(14, 165, 233, 0.2);
+    -fx-background-color: rgba(14, 165, 233, 0.18);
     -fx-text-fill: #38BDF8;
 }
 
 /* Detail Drawer */
 .detail-drawer {
-    -fx-background-color: #1E293B;
-    -fx-border-color: #334155;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }
 
 .detail-header-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F8FAFC;
+    -fx-text-fill: #F9FAFB;
 }
 
 .detail-field-label {
     -fx-font-size: 12px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: #9CA3AF;
     -fx-font-weight: bold;
 }
 
 .detail-field-value {
     -fx-font-size: 13px;
-    -fx-text-fill: #F8FAFC;
+    -fx-text-fill: #F9FAFB;
 }
 
 .status-footer-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: #6B7280;
 }
 
 /* Dashboard Cards */
 .dashboard-scroll {
-    -fx-background-color: #0F172A;
+    -fx-background-color: #0B0F19;
 }
 
 .dashboard-header-title {
-    -fx-font-size: 20px;
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F8FAFC;
+    -fx-text-fill: #F9FAFB;
 }
 
 .dashboard-header-subtitle {
     -fx-font-size: 13px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: #9CA3AF;
 }
 
 .metric-card {
-    -fx-background-color: #1E293B;
-    -fx-border-color: #334155;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
     -fx-cursor: hand;
 }
 
@@ -290,19 +297,19 @@
 
 .metric-title {
     -fx-font-size: 12px;
-    -fx-text-fill: #94A3B8;
+    -fx-text-fill: #9CA3AF;
     -fx-font-weight: bold;
 }
 
 .metric-value {
-    -fx-font-size: 24px;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F8FAFC;
+    -fx-text-fill: #F9FAFB;
 }
 
 .metric-desc {
     -fx-font-size: 11px;
-    -fx-text-fill: #64748B;
+    -fx-text-fill: #6B7280;
 }
 
 .metric-blue .metric-value { -fx-text-fill: #38BDF8; }
@@ -312,14 +319,14 @@
 .metric-purple .metric-value { -fx-text-fill: #C084FC; }
 
 .dashboard-card {
-    -fx-background-color: #1E293B;
-    -fx-border-color: #334155;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
+    -fx-background-color: #111827;
+    -fx-border-color: #1F2937;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
 }
 
 .card-title {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F8FAFC;
+    -fx-text-fill: #F9FAFB;
 }
