@@ -112,6 +112,10 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
         btnRefresh.getStyleClass().add("button-secondary");
         btnRefresh.setOnAction(e -> refreshData());
 
+        Button btnImport = new Button("📥 Import Data");
+        btnImport.getStyleClass().add("button-secondary");
+        btnImport.setOnAction(e -> handleImport());
+
         Button btnAdd = new Button("➕ Add New");
         btnAdd.getStyleClass().add("button-primary");
         btnAdd.setOnAction(e -> handleAddNew());
@@ -119,8 +123,20 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        toolbar.getChildren().addAll(searchField, filterCombo, btnRefresh, spacer, btnAdd);
+        if (supportsImport()) {
+            toolbar.getChildren().addAll(searchField, filterCombo, btnRefresh, btnImport, spacer, btnAdd);
+        } else {
+            toolbar.getChildren().addAll(searchField, filterCombo, btnRefresh, spacer, btnAdd);
+        }
         return toolbar;
+    }
+
+    protected boolean supportsImport() {
+        return false;
+    }
+
+    protected void handleImport() {
+        // Override in subclass
     }
 
     private VBox buildDetailDrawer() {

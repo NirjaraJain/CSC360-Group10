@@ -9,7 +9,9 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -31,9 +33,35 @@ public class MemberMasterDetailView extends MasterDetailView<Member, String> {
     }
 
     @Override
+    protected boolean supportsImport() {
+        return true;
+    }
+
+    @Override
+    protected void handleImport() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Import Member Roster (Excel / CSV)");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Supported Files (*.xlsx, *.xls, *.csv)", "*.xlsx", "*.xls", "*.csv"),
+                new FileChooser.ExtensionFilter("Excel Files (*.xlsx, *.xls)", "*.xlsx", "*.xls"),
+                new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv")
+        );
+        File file = chooser.showOpenDialog(getScene().getWindow());
+        if (file != null) {
+            try {
+                int count = libraryService.importMembersFromFile(file);
+                refreshData();
+                showAlert(Alert.AlertType.INFORMATION, "Import Successful", "Successfully imported " + count + " member record(s).");
+            } catch (Exception ex) {
+                showAlert(Alert.AlertType.ERROR, "Import Error", "Failed to import member roster: " + ex.getMessage());
+            }
+        }
+    }
+
+    @Override
     protected TableView<Member> buildMasterTable() {
         TableView<Member> table = new TableView<>();
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<Member, String> colId = new TableColumn<>("Member ID");
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -89,18 +117,20 @@ public class MemberMasterDetailView extends MasterDetailView<Member, String> {
 
     @Override
     protected boolean matchesKeyword(Member member, String keyword) {
-        return member.getName().toLowerCase().contains(keyword) ||
-               member.getEmail().toLowerCase().contains(keyword) ||
-               member.getId().toLowerCase().contains(keyword) ||
-               member.getPhone().toLowerCase().contains(keyword);
+        if (member == null) return false;
+        return (member.getName() != null && member.getName().toLowerCase().contains(keyword)) ||
+               (member.getEmail() != null && member.getEmail().toLowerCase().contains(keyword)) ||
+               (member.getId() != null && member.getId().toLowerCase().contains(keyword)) ||
+               (member.getPhone() != null && member.getPhone().toLowerCase().contains(keyword));
     }
 
     @Override
     protected boolean matchesCategory(Member member, String category) {
+        if (member == null || category == null) return true;
         if ("ACTIVE".equalsIgnoreCase(category) || "SUSPENDED".equalsIgnoreCase(category)) {
-            return member.getStatus().equalsIgnoreCase(category);
+            return member.getStatus() != null && member.getStatus().equalsIgnoreCase(category);
         }
-        return member.getMembershipType().equalsIgnoreCase(category);
+        return member.getMembershipType() != null && member.getMembershipType().equalsIgnoreCase(category);
     }
 
     @Override
