@@ -11,6 +11,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 
+import javafx.stage.FileChooser;
+import java.io.File;
 import java.util.List;
 
 public class BookMasterDetailView extends MasterDetailView<Book, String> {
@@ -35,9 +37,35 @@ public class BookMasterDetailView extends MasterDetailView<Book, String> {
     }
 
     @Override
+    protected boolean supportsImport() {
+        return true;
+    }
+
+    @Override
+    protected void handleImport() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Import Books Dataset (CSV / Excel)");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Supported Files (*.csv, *.xlsx, *.xls)", "*.csv", "*.xlsx", "*.xls"),
+                new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"),
+                new FileChooser.ExtensionFilter("Excel Files (*.xlsx, *.xls)", "*.xlsx", "*.xls")
+        );
+        File file = chooser.showOpenDialog(getScene().getWindow());
+        if (file != null) {
+            try {
+                int count = libraryService.importBooksFromFile(file);
+                refreshData();
+                showAlert(Alert.AlertType.INFORMATION, "Import Successful", "Successfully imported " + count + " book record(s).");
+            } catch (Exception ex) {
+                showAlert(Alert.AlertType.ERROR, "Import Error", "Failed to import file: " + ex.getMessage());
+            }
+        }
+    }
+
+    @Override
     protected TableView<Book> buildMasterTable() {
         TableView<Book> table = new TableView<>();
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<Book, String> colId = new TableColumn<>("Book ID");
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -101,25 +129,30 @@ public class BookMasterDetailView extends MasterDetailView<Book, String> {
                 "Computer Science",
                 "Software Architecture",
                 "UI Engineering",
+                "History",
+                "Fiction",
+                "Cooking",
                 "Available Only"
         );
     }
 
     @Override
     protected boolean matchesKeyword(Book book, String keyword) {
-        return book.getTitle().toLowerCase().contains(keyword) ||
-               book.getAuthor().toLowerCase().contains(keyword) ||
-               book.getIsbn().toLowerCase().contains(keyword) ||
-               book.getId().toLowerCase().contains(keyword) ||
-               book.getCategory().toLowerCase().contains(keyword);
+        if (book == null) return false;
+        return (book.getTitle() != null && book.getTitle().toLowerCase().contains(keyword)) ||
+               (book.getAuthor() != null && book.getAuthor().toLowerCase().contains(keyword)) ||
+               (book.getIsbn() != null && book.getIsbn().toLowerCase().contains(keyword)) ||
+               (book.getId() != null && book.getId().toLowerCase().contains(keyword)) ||
+               (book.getCategory() != null && book.getCategory().toLowerCase().contains(keyword));
     }
 
     @Override
     protected boolean matchesCategory(Book book, String category) {
+        if (book == null || category == null) return true;
         if ("Available Only".equalsIgnoreCase(category)) {
             return book.isAvailable();
         }
-        return book.getCategory().equalsIgnoreCase(category);
+        return book.getCategory() != null && book.getCategory().toLowerCase().contains(category.toLowerCase());
     }
 
     @Override
@@ -234,10 +267,10 @@ public class BookMasterDetailView extends MasterDetailView<Book, String> {
             throw new IllegalArgumentException("Book ID, Title, and Author are required fields.");
         }
 
-        int year = spinYear.getValue();
-        int total = spinTotal.getValue();
-        int avail = spinAvailable.getValue();
-        double rating = spinRating.getValue();
+        int year = spinYear.getValue() != null ? spinYear.getValue() : 2024;
+        int total = spinTotal.getValue() != null ? spinTotal.getValue() : 1;
+        int avail = spinAvailable.getValue() != null ? spinAvailable.getValue() : 1;
+        double rating = spinRating.getValue() != null ? spinRating.getValue() : 4.5;
         String desc = txtDescription.getText().trim();
 
         if (avail > total) {

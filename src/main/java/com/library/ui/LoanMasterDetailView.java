@@ -36,7 +36,7 @@ public class LoanMasterDetailView extends MasterDetailView<Loan, String> {
     @Override
     protected TableView<Loan> buildMasterTable() {
         TableView<Loan> table = new TableView<>();
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<Loan, String> colId = new TableColumn<>("Loan ID");
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -98,15 +98,17 @@ public class LoanMasterDetailView extends MasterDetailView<Loan, String> {
 
     @Override
     protected boolean matchesKeyword(Loan loan, String keyword) {
-        return loan.getId().toLowerCase().contains(keyword) ||
-               loan.getBookTitle().toLowerCase().contains(keyword) ||
-               loan.getMemberName().toLowerCase().contains(keyword) ||
-               loan.getBookId().toLowerCase().contains(keyword) ||
-               loan.getMemberId().toLowerCase().contains(keyword);
+        if (loan == null) return false;
+        return (loan.getId() != null && loan.getId().toLowerCase().contains(keyword)) ||
+               (loan.getBookTitle() != null && loan.getBookTitle().toLowerCase().contains(keyword)) ||
+               (loan.getMemberName() != null && loan.getMemberName().toLowerCase().contains(keyword)) ||
+               (loan.getBookId() != null && loan.getBookId().toLowerCase().contains(keyword)) ||
+               (loan.getMemberId() != null && loan.getMemberId().toLowerCase().contains(keyword));
     }
 
     @Override
     protected boolean matchesCategory(Loan loan, String category) {
+        if (loan == null || category == null || loan.getStatus() == null) return true;
         return loan.getStatus().name().equalsIgnoreCase(category);
     }
 

@@ -6,12 +6,13 @@ import com.library.model.LoanStatus;
 import com.library.model.Member;
 import com.library.repository.GenericRepository;
 import com.library.repository.InMemoryRepository;
+import com.library.util.DataImportService;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Service layer coordinating Generic Repositories for Books, Members, and Loans.
@@ -39,6 +40,22 @@ public class LibraryService {
 
     public GenericRepository<Loan, String> getLoanRepository() {
         return loanRepository;
+    }
+
+    public int importBooksFromFile(File file) throws Exception {
+        List<Book> imported = DataImportService.importBooksFromFile(file);
+        for (Book b : imported) {
+            bookRepository.save(b);
+        }
+        return imported.size();
+    }
+
+    public int importMembersFromFile(File file) throws Exception {
+        List<Member> imported = DataImportService.importMembersFromFile(file);
+        for (Member m : imported) {
+            memberRepository.save(m);
+        }
+        return imported.size();
     }
 
     // High-level circulation actions
@@ -122,26 +139,73 @@ public class LibraryService {
     }
 
     private void seedInitialData() {
-        // Seed Books
-        bookRepository.save(new Book("BK-101", "Clean Code: Refactoring & Patterns", "978-0132350884", "Robert C. Martin", "Software Engineering", 2008, 5, 3, 4.8, "A handbook of agile software craftsmanship outlining clean coding principles and techniques."));
-        bookRepository.save(new Book("BK-102", "Effective Java (3rd Edition)", "978-0134685991", "Joshua Bloch", "Computer Science", 2017, 4, 2, 4.9, "Best practices guide for the Java programming language covering design patterns and lambdas."));
-        bookRepository.save(new Book("BK-103", "Design Patterns: Reusable Object-Oriented Software", "978-0201633610", "Erich Gamma et al.", "Software Architecture", 1994, 3, 0, 4.7, "Classic Gang of Four reference catalog for object-oriented design patterns."));
-        bookRepository.save(new Book("BK-104", "The Pragmatic Programmer", "978-0135957059", "Andrew Hunt, David Thomas", "Software Engineering", 2019, 6, 5, 4.9, "Timeless advice for modern programmers on career growth, debugging, and software craft."));
-        bookRepository.save(new Book("BK-105", "Introduction to Algorithms (4th Edition)", "978-0262046305", "Thomas H. Cormen et al.", "Computer Science", 2022, 2, 1, 4.6, "Comprehensive textbook covering fundamental computer algorithms and data structures."));
-        bookRepository.save(new Book("BK-106", "JavaFX in Action", "978-1617290886", "Carl Dea", "UI Engineering", 2020, 4, 4, 4.5, "Detailed guide to modern desktop client application development with JavaFX."));
+        boolean booksLoaded = false;
+        boolean membersLoaded = false;
 
-        // Seed Members
-        memberRepository.save(new Member("MB-1001", "Alice Johnson", "alice.j@university.edu", "+1 (555) 234-5678", "Student", LocalDate.of(2023, 9, 1), 2, "ACTIVE"));
-        memberRepository.save(new Member("MB-1002", "Prof. Robert Langdon", "rlangdon@harvard.edu", "+1 (555) 987-6543", "Faculty", LocalDate.of(2021, 1, 15), 1, "ACTIVE"));
-        memberRepository.save(new Member("MB-1003", "Clara Oswald", "clara.oswald@gmail.com", "+1 (555) 456-7890", "Regular", LocalDate.of(2024, 2, 10), 0, "ACTIVE"));
-        memberRepository.save(new Member("MB-1004", "David Miller", "david.miller@techcorp.io", "+1 (555) 321-7654", "Student", LocalDate.of(2022, 11, 20), 1, "ACTIVE"));
-        memberRepository.save(new Member("MB-1005", "Eleanor Vance", "evance@hillhouse.org", "+1 (555) 654-0987", "Regular", LocalDate.of(2023, 5, 12), 0, "SUSPENDED"));
+        // Try loading real book dataset from local system if available
+        File csvBooks = new File("C:\\Users\\nirja\\Downloads\\BooksDatasetClean.csv");
+        if (csvBooks.exists()) {
+            try {
+                int count = importBooksFromFile(csvBooks);
+                if (count > 0) booksLoaded = true;
+            } catch (Exception e) {
+                System.err.println("Could not load BooksDatasetClean.csv: " + e.getMessage());
+            }
+        }
 
-        // Seed Loans
-        LocalDate now = LocalDate.now();
-        loanRepository.save(new Loan("LN-1001", "BK-101", "Clean Code: Refactoring & Patterns", "MB-1001", "Alice Johnson", now.minusDays(10), now.plusDays(4), null, LoanStatus.ACTIVE, 0.0));
-        loanRepository.save(new Loan("LN-1002", "BK-102", "Effective Java (3rd Edition)", "MB-1001", "Alice Johnson", now.minusDays(5), now.plusDays(9), null, LoanStatus.ACTIVE, 0.0));
-        loanRepository.save(new Loan("LN-1003", "BK-103", "Design Patterns: Reusable Object-Oriented Software", "MB-1002", "Prof. Robert Langdon", now.minusDays(20), now.minusDays(6), null, LoanStatus.OVERDUE, 9.00));
-        loanRepository.save(new Loan("LN-1004", "BK-104", "The Pragmatic Programmer", "MB-1004", "David Miller", now.minusDays(15), now.minusDays(1), now.minusDays(1), LoanStatus.RETURNED, 0.0));
+        // Try loading real member dataset from local system if available
+        String[] memberPaths = {
+            "C:\\Users\\nirja\\Downloads\\_Section-2 (4).xlsx",
+            "C:\\Users\\nirja\\Downloads\\_Section-2 (3).xlsx",
+            "C:\\Users\\nirja\\Downloads\\_Section-4.xlsx"
+        };
+        for (String p : memberPaths) {
+            File memberFile = new File(p);
+            if (memberFile.exists()) {
+                try {
+                    int count = importMembersFromFile(memberFile);
+                    if (count > 0) {
+                        membersLoaded = true;
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Could not load member roster from " + p + ": " + e.getMessage());
+                }
+            }
+        }
+
+        // Fallback seed Books if none loaded
+        if (!booksLoaded || bookRepository.count() == 0) {
+            bookRepository.save(new Book("BK-101", "Clean Code: Refactoring & Patterns", "978-0132350884", "Robert C. Martin", "Software Engineering", 2008, 5, 3, 4.8, "A handbook of agile software craftsmanship outlining clean coding principles and techniques."));
+            bookRepository.save(new Book("BK-102", "Effective Java (3rd Edition)", "978-0134685991", "Joshua Bloch", "Computer Science", 2017, 4, 2, 4.9, "Best practices guide for the Java programming language covering design patterns and lambdas."));
+            bookRepository.save(new Book("BK-103", "Design Patterns: Reusable Object-Oriented Software", "978-0201633610", "Erich Gamma et al.", "Software Architecture", 1994, 3, 0, 4.7, "Classic Gang of Four reference catalog for object-oriented design patterns."));
+            bookRepository.save(new Book("BK-104", "The Pragmatic Programmer", "978-0135957059", "Andrew Hunt, David Thomas", "Software Engineering", 2019, 6, 5, 4.9, "Timeless advice for modern programmers on career growth, debugging, and software craft."));
+            bookRepository.save(new Book("BK-105", "Introduction to Algorithms (4th Edition)", "978-0262046305", "Thomas H. Cormen et al.", "Computer Science", 2022, 2, 1, 4.6, "Comprehensive textbook covering fundamental computer algorithms and data structures."));
+            bookRepository.save(new Book("BK-106", "JavaFX in Action", "978-1617290886", "Carl Dea", "UI Engineering", 2020, 4, 4, 4.5, "Detailed guide to modern desktop client application development with JavaFX."));
+        }
+
+        // Fallback seed Members if none loaded
+        if (!membersLoaded || memberRepository.count() == 0) {
+            memberRepository.save(new Member("MB-1001", "Alice Johnson", "alice.j@university.edu", "+1 (555) 234-5678", "Student", LocalDate.of(2023, 9, 1), 2, "ACTIVE"));
+            memberRepository.save(new Member("MB-1002", "Prof. Robert Langdon", "rlangdon@harvard.edu", "+1 (555) 987-6543", "Faculty", LocalDate.of(2021, 1, 15), 1, "ACTIVE"));
+            memberRepository.save(new Member("MB-1003", "Clara Oswald", "clara.oswald@gmail.com", "+1 (555) 456-7890", "Regular", LocalDate.of(2024, 2, 10), 0, "ACTIVE"));
+            memberRepository.save(new Member("MB-1004", "David Miller", "david.miller@techcorp.io", "+1 (555) 321-7654", "Student", LocalDate.of(2022, 11, 20), 1, "ACTIVE"));
+            memberRepository.save(new Member("MB-1005", "Eleanor Vance", "evance@hillhouse.org", "+1 (555) 654-0987", "Regular", LocalDate.of(2023, 5, 12), 0, "SUSPENDED"));
+        }
+
+        // Seed initial loans matching existing books and members
+        List<Book> allBooks = bookRepository.findAll();
+        List<Member> allMembers = memberRepository.findAll();
+        if (!allBooks.isEmpty() && !allMembers.isEmpty()) {
+            LocalDate now = LocalDate.now();
+            Book b1 = allBooks.get(0);
+            Book b2 = allBooks.size() > 1 ? allBooks.get(1) : b1;
+            Member m1 = allMembers.get(0);
+            Member m2 = allMembers.size() > 1 ? allMembers.get(1) : m1;
+
+            loanRepository.save(new Loan("LN-1001", b1.getId(), b1.getTitle(), m1.getId(), m1.getName(), now.minusDays(10), now.plusDays(4), null, LoanStatus.ACTIVE, 0.0));
+            loanRepository.save(new Loan("LN-1002", b2.getId(), b2.getTitle(), m2.getId(), m2.getName(), now.minusDays(20), now.minusDays(6), null, LoanStatus.OVERDUE, 9.00));
+        }
     }
 }
+

@@ -114,7 +114,7 @@ public class DashboardView extends ScrollPane {
 
         TableView<Loan> table = new TableView<>();
         table.setPrefHeight(220);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<Loan, String> colId = new TableColumn<>("Loan ID");
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
