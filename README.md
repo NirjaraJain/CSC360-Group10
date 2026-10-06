@@ -12,20 +12,32 @@
 ## 📸 Application Screenshots
 
 ### 📊 Dashboard — Executive Overview
-![Dashboard View](docs/screenshots/dashboard.jpg)
-> Live metric cards showing total books, registered patrons, active borrowings, overdue items, and total fines accrued. Each card is clickable and navigates directly to the relevant module.
+![Dashboard View](docs/screenshots/dashboard.png)
+> Live metric cards showing total books (6), registered patrons (5), active borrowings (3), overdue items (1), and total fines accrued ($9.00). Includes recent circulation history log.
 
 ---
 
 ### 📚 Books Catalog — Master-Detail View
-![Books Catalog](docs/screenshots/books_view.jpg)
-> Full book catalog with searchable/filterable master table on the left and a rich detail panel on the right. Color-coded availability badges (AVAILABLE / OUT OF STOCK). Inline checkout dialog for borrowing a book to any active member.
+![Books Catalog](docs/screenshots/books_view.png)
+> Full book catalog with searchable/filterable master table on the left and a rich detail panel on the right. Features color-coded availability badges and direct checkout action button.
+
+---
+
+### 👥 Member Directory — Patron Management
+![Member Directory](docs/screenshots/members_view.png)
+> Comprehensive member directory supporting Students, Faculty, and Regular patrons with status indicators (`ACTIVE`, `SUSPENDED`) and loan history tracking.
 
 ---
 
 ### 📖 Circulation Loans — Loan Tracking
-![Loans View](docs/screenshots/loans_view.jpg)
-> Complete loan tracking with status badges (Active, Overdue, Returned). One-click return processing with automatic fine calculation ($1.50/day overdue). Filterable by loan status.
+![Loans View](docs/screenshots/loans_view.png)
+> Active borrowing records displaying issue dates, due dates, loan status, and fine accrual indicators.
+
+---
+
+### ➕ New Entry Form — Record Creation Dialog
+![New Entry Form](docs/screenshots/add_entry_dialog.png)
+> Clean modal dialog overlay for adding new books, members, or loans into the system with auto-generated primary keys.
 
 ---
 
