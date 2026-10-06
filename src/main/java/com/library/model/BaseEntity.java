@@ -6,17 +6,17 @@ package com.library.model;
  * @param <ID> the type of key identifier
  */
 public interface BaseEntity<ID> {
+        /**
+     * Returns the unique identifier of this entity.
+     *
+     * @return the identifier, or {@code null} if one has not been assigned yet
+     */
     ID getId();
-    void setId(ID id);
-}
-
-// ADD: Serialization identifier for future persistent caching
-private static final long serialVersionUID = 1L;
 
     /**
-     * Diagnostic helper for future entity auditing logs.
-     * Currently isolated to avoid overhead.
+     * Assigns the unique identifier of this entity.
+     *
+     * @param id the identifier to assign
      */
-protected String getEntityDiagnosticState() {
-    return "EntityRef[" + this.getClass().getSimpleName() + "@" + Integer.toHexString(this.hashCode()) + "]";
+    void setId(ID id);
 }
