@@ -13,6 +13,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class LoanMasterDetailView extends MasterDetailView<Loan, String> {
@@ -164,7 +165,7 @@ public class LoanMasterDetailView extends MasterDetailView<Loan, String> {
         boolean isNew = loan == null || loan.getId() == null;
 
         txtId = new TextField(isNew ? "LN-" + (1000 + repository.count() + 1) : loan.getId());
-        txtId.setDisable(!isNew);
+        txtId.setDisable(true);
 
         comboBook = new ComboBox<>();
         List<Book> books = libraryService.getBookRepository().findAll();
@@ -223,6 +224,46 @@ public class LoanMasterDetailView extends MasterDetailView<Loan, String> {
         double fine = existing != null ? existing.getFineAmount() : 0.0;
 
         return new Loan(id, book.getId(), book.getTitle(), member.getId(), member.getName(), issue, due, returnDate, status, fine);
+    }
+
+    @Override
+    protected void handleSave() {
+        if (currentSelection != null && currentSelection.getId() != null) {
+            super.handleSave();
+            return;
+        }
+
+        try {
+            Loan formLoan = readFormData(currentSelection);
+            if (formLoan.getStatus() != LoanStatus.ACTIVE) {
+                throw new IllegalArgumentException("New circulation logs must be created as active checkouts.");
+            }
+            if (formLoan.getIssueDate().isAfter(LocalDate.now())
+                    || formLoan.getDueDate().isBefore(LocalDate.now())
+                    || formLoan.getDueDate().isBefore(formLoan.getIssueDate())) {
+                throw new IllegalArgumentException("An active loan must have a valid issue date and a due date that has not passed.");
+            }
+
+            String expectedLoanId = "LN-" + (1000 + repository.count() + 1);
+            if (repository.findById(expectedLoanId).isPresent()) {
+                throw new IllegalStateException("Cannot create a loan because generated ID " + expectedLoanId + " already exists.");
+            }
+
+            int loanDays = Math.toIntExact(Math.max(1,
+                    ChronoUnit.DAYS.between(formLoan.getIssueDate(), formLoan.getDueDate())));
+            Loan createdLoan = libraryService.checkoutBook(
+                    formLoan.getBookId(), formLoan.getMemberId(), loanDays);
+            createdLoan.setIssueDate(formLoan.getIssueDate());
+            createdLoan.setDueDate(formLoan.getDueDate());
+            repository.save(createdLoan);
+
+            currentSelection = createdLoan;
+            isEditMode = false;
+            refreshData();
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Circulation log created and book checked out successfully.");
+        } catch (Exception ex) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", ex.getMessage());
+        }
     }
 
     @Override
