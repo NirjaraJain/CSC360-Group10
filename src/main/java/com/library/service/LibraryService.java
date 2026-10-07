@@ -193,19 +193,38 @@ public class LibraryService {
             memberRepository.save(new Member("MB-1005", "Eleanor Vance", "evance@hillhouse.org", "+1 (555) 654-0987", "Regular", LocalDate.of(2023, 5, 12), 0, "SUSPENDED"));
         }
 
-        // Seed initial loans matching existing books and members
-        List<Book> allBooks = bookRepository.findAll();
-        List<Member> allMembers = memberRepository.findAll();
-        if (!allBooks.isEmpty() && !allMembers.isEmpty()) {
-            LocalDate now = LocalDate.now();
-            Book b1 = allBooks.get(0);
-            Book b2 = allBooks.size() > 1 ? allBooks.get(1) : b1;
-            Member m1 = allMembers.get(0);
-            Member m2 = allMembers.size() > 1 ? allMembers.get(1) : m1;
+        // Reconcile the imported or fallback starting values before creating demo loans.
+        if (loanRepository.count() == 0) {
+            for (Book book : bookRepository.findAll()) {
+                book.setAvailableCopies(book.getTotalCopies());
+                bookRepository.save(book);
+            }
+            for (Member member : memberRepository.findAll()) {
+                member.setActiveLoansCount(0);
+                memberRepository.save(member);
+            }
 
-            loanRepository.save(new Loan("LN-1001", b1.getId(), b1.getTitle(), m1.getId(), m1.getName(), now.minusDays(10), now.plusDays(4), null, LoanStatus.ACTIVE, 0.0));
-            loanRepository.save(new Loan("LN-1002", b2.getId(), b2.getTitle(), m2.getId(), m2.getName(), now.minusDays(20), now.minusDays(6), null, LoanStatus.OVERDUE, 9.00));
+            List<Book> seedBooks = bookRepository.search(book -> book.getAvailableCopies() > 0);
+            List<Member> activeMembers = memberRepository.search(member ->
+                    "ACTIVE".equalsIgnoreCase(member.getStatus()));
+
+            if (!seedBooks.isEmpty() && !activeMembers.isEmpty()) {
+                LocalDate now = LocalDate.now();
+                checkoutBook(seedBooks.get(0).getId(), activeMembers.get(0).getId(), 14);
+
+                List<Book> remainingBooks = bookRepository.search(book -> book.getAvailableCopies() > 0);
+                if (!remainingBooks.isEmpty()) {
+                    Member secondMember = activeMembers.size() > 1 ? activeMembers.get(1) : activeMembers.get(0);
+                    Loan overdueLoan = checkoutBook(
+                            remainingBooks.get(0).getId(), secondMember.getId(), 14);
+                    overdueLoan.setIssueDate(now.minusDays(20));
+                    overdueLoan.setDueDate(now.minusDays(6));
+                    overdueLoan.setStatus(LoanStatus.OVERDUE);
+                    overdueLoan.setFineAmount(
+                            ChronoUnit.DAYS.between(overdueLoan.getDueDate(), now) * 1.50);
+                    loanRepository.save(overdueLoan);
+                }
+            }
         }
     }
 }
-
