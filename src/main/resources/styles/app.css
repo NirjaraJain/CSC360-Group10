@@ -244,6 +244,11 @@
     -fx-background-radius: 10px;
 }
 
+.detail-form-scroll,
+.detail-form-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
 .detail-header {
     -fx-padding: 0 0 8px 0;
 }

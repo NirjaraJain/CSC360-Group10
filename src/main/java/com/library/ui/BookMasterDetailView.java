@@ -2,6 +2,7 @@ package com.library.ui;
 
 import com.library.model.Book;
 import com.library.model.Member;
+import com.library.repository.GenericRepository;
 import com.library.service.LibraryService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -212,7 +213,7 @@ public class BookMasterDetailView extends MasterDetailView<Book, String> {
 
         boolean isNew = book == null || book.getId() == null;
 
-        txtId = new TextField(isNew ? "BK-" + (100 + repository.count() + 1) : book.getId());
+        txtId = new TextField(isNew ? generateNewBookId(repository) : book.getId());
         txtId.setDisable(!isNew); // Primary key locked if editing
 
         txtTitle = new TextField(isNew ? "" : book.getTitle());
@@ -247,12 +248,25 @@ public class BookMasterDetailView extends MasterDetailView<Book, String> {
         grid.add(new Label("Rating:"), 0, 8); grid.add(spinRating, 1, 8);
         grid.add(new Label("Description:"), 0, 9); grid.add(txtDescription, 1, 9);
 
-        return grid;
+        ScrollPane formScrollPane = new ScrollPane(grid);
+        formScrollPane.setFitToWidth(true);
+        formScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        formScrollPane.getStyleClass().add("detail-form-scroll");
+        return formScrollPane;
     }
 
     @Override
     protected Book createNewInstance() {
         return new Book();
+    }
+
+    static String generateNewBookId(GenericRepository<Book, String> repository) {
+        long nextId = 100 + repository.count() + 1;
+        String id;
+        do {
+            id = "BK-" + nextId++;
+        } while (repository.findById(id).isPresent());
+        return id;
     }
 
     @Override
@@ -265,6 +279,9 @@ public class BookMasterDetailView extends MasterDetailView<Book, String> {
 
         if (id.isEmpty() || title.isEmpty() || author.isEmpty()) {
             throw new IllegalArgumentException("Book ID, Title, and Author are required fields.");
+        }
+        if ((existing == null || existing.getId() == null) && repository.findById(id).isPresent()) {
+            throw new IllegalArgumentException("A book with ID " + id + " already exists.");
         }
 
         int year = spinYear.getValue() != null ? spinYear.getValue() : 2024;

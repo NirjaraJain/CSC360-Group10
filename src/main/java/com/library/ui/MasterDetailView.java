@@ -43,6 +43,7 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
 
     protected T currentSelection;
     protected boolean isEditMode = false;
+    private boolean isRefreshingData;
 
     public MasterDetailView(GenericRepository<T, ID> repository) {
         this.repository = repository;
@@ -63,8 +64,10 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
         masterTable.setItems(masterData);
         masterTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             currentSelection = newVal;
-            isEditMode = false;
-            updateDetailDrawer();
+            if (!isRefreshingData) {
+                isEditMode = false;
+                updateDetailDrawer();
+            }
         });
 
         // Wrap Table in a VBox with Status Footer
@@ -193,9 +196,36 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
     }
 
     public void refreshData() {
-        masterData.setAll(repository.findAll());
-        applyFilter();
-        updateCountLabel();
+        ID selectedId = currentSelection == null ? null : currentSelection.getId();
+
+        isRefreshingData = true;
+        try {
+            masterData.setAll(repository.findAll());
+            applyFilter();
+
+            if (selectedId != null) {
+                T refreshedSelection = repository.findById(selectedId).orElse(null);
+                currentSelection = refreshedSelection;
+
+                if (refreshedSelection == null) {
+                    masterTable.getSelectionModel().clearSelection();
+                } else {
+                    masterTable.getItems().stream()
+                            .filter(item -> selectedId.equals(item.getId()))
+                            .findFirst()
+                            .ifPresentOrElse(
+                                    masterTable.getSelectionModel()::select,
+                                    () -> masterTable.getSelectionModel().clearSelection());
+                }
+            }
+        } finally {
+            isRefreshingData = false;
+        }
+
+        if (selectedId != null) {
+            isEditMode = false;
+            updateDetailDrawer();
+        }
     }
 
     protected void applyFilter() {
@@ -210,6 +240,7 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
 
         List<T> filtered = repository.search(predicate);
         masterTable.setItems(FXCollections.observableArrayList(filtered));
+        masterTable.refresh();
         updateCountLabel();
     }
 
@@ -259,9 +290,9 @@ public abstract class MasterDetailView<T extends BaseEntity<ID>, ID> extends Bor
     }
 
     protected void handleAddNew() {
+        masterTable.getSelectionModel().clearSelection();
         currentSelection = createNewInstance();
         isEditMode = true;
-        masterTable.getSelectionModel().clearSelection();
         updateDetailDrawer();
     }
 

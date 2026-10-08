@@ -2,6 +2,7 @@ package com.library.ui;
 
 import com.library.model.Loan;
 import com.library.model.Member;
+import com.library.repository.GenericRepository;
 import com.library.service.LibraryService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -199,7 +200,7 @@ public class MemberMasterDetailView extends MasterDetailView<Member, String> {
 
         boolean isNew = member == null || member.getId() == null;
 
-        txtId = new TextField(isNew ? "MB-" + (1000 + repository.count() + 1) : member.getId());
+        txtId = new TextField(isNew ? generateNewMemberId(repository) : member.getId());
         txtId.setDisable(!isNew);
 
         txtName = new TextField(isNew ? "" : member.getName());
@@ -229,6 +230,15 @@ public class MemberMasterDetailView extends MasterDetailView<Member, String> {
         return new Member();
     }
 
+    static String generateNewMemberId(GenericRepository<Member, String> repository) {
+        long nextId = 1000 + repository.count() + 1;
+        String id;
+        do {
+            id = "MB-" + nextId++;
+        } while (repository.findById(id).isPresent());
+        return id;
+    }
+
     @Override
     protected Member readFormData(Member existing) throws Exception {
         String id = txtId.getText().trim();
@@ -240,6 +250,9 @@ public class MemberMasterDetailView extends MasterDetailView<Member, String> {
 
         if (id.isEmpty() || name.isEmpty() || email.isEmpty()) {
             throw new IllegalArgumentException("Member ID, Name, and Email are required fields.");
+        }
+        if ((existing == null || existing.getId() == null) && repository.findById(id).isPresent()) {
+            throw new IllegalArgumentException("A member with ID " + id + " already exists.");
         }
 
         LocalDate joinDate = existing != null && existing.getJoinDate() != null ? existing.getJoinDate() : LocalDate.now();
